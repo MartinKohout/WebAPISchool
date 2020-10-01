@@ -100,6 +100,7 @@ namespace WebAPI.Controllers
             }
             return Ok(result);
         }
+
         [HttpPost("{id}/tags")]
         public async Task<ActionResult<Quote>> PostTags(int id, [FromBody] IEnumerable<int> tagIds)
         {
