@@ -86,6 +86,25 @@ namespace WebAPI.Controllers
             return CreatedAtAction("GetQuote", new { id = quote.Id }, quote);
         }
 
+        [HttpPost("{id}/tags")]
+        public async Task<ActionResult<Quote>> PostTags(int id, [FromBody] IEnumerable<int> tagIds)
+        {
+            IList<QuoteTag> quoteTags = new List<QuoteTag>();
+            foreach (var item in tagIds)
+            {
+                QuoteTag newQuote = new QuoteTag
+                {
+                    QuoteId = id,
+                    TagId = item
+                };
+                quoteTags.Add(newQuote);
+            }
+            _context.QuoteTags.AddRange(quoteTags);
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
         // DELETE: api/Quotes/5
         [HttpDelete("{id}")]
         public async Task<ActionResult<Quote>> DeleteQuote(int id)
