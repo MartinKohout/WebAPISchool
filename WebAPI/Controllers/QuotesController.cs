@@ -86,6 +86,20 @@ namespace WebAPI.Controllers
             return CreatedAtAction("GetQuote", new { id = quote.Id }, quote);
         }
 
+        [HttpGet("{id}/tags")]
+        public async Task<ActionResult<IEnumerable<Tag>>> GetQuoteTags(int id)
+        {
+
+             IList<QuoteTag> quoteTags = await _context.QuoteTags.Where(item => item.QuoteId == id)
+                .Include(item => item.Tag)
+                .ToListAsync();
+            IList<Tag> result = new List<Tag>();
+            foreach (var item in quoteTags)
+            {
+                result.Add(item.Tag);
+            }
+            return Ok(result);
+        }
         [HttpPost("{id}/tags")]
         public async Task<ActionResult<Quote>> PostTags(int id, [FromBody] IEnumerable<int> tagIds)
         {
