@@ -90,15 +90,24 @@ namespace WebAPI.Controllers
         public async Task<ActionResult<IEnumerable<Tag>>> GetQuoteTags(int id)
         {
 
-             IList<QuoteTag> quoteTags = await _context.QuoteTags.Where(item => item.QuoteId == id)
-                .Include(item => item.Tag)
-                .ToListAsync();
-            IList<Tag> result = new List<Tag>();
-            foreach (var item in quoteTags)
+            // IList<QuoteTag> quoteTags = await _context.QuoteTags.Where(item => item.QuoteId == id)
+            //    .Include(item => item.Tag)
+            //    .ToListAsync();
+            //IList<Tag> result = new List<Tag>();
+            //foreach (var item in quoteTags)
+            //{
+            //    result.Add(item.Tag);
+            //}
+            var quote =  _context.Quotes.Where(q => q.Id == id)
+                    .Include(s => s.QuoteTags)
+                    .ThenInclude(tag => tag.Tag);
+
+            if (quote == null)
             {
-                result.Add(item.Tag);
+                return NotFound();
             }
-            return Ok(result);
+
+            return Ok(quote.Select(item => item.QuoteTags.Select(tag => tag.Tag)).ToList());
         }
 
         [HttpPost("{id}/tags")]
@@ -117,7 +126,7 @@ namespace WebAPI.Controllers
             _context.QuoteTags.AddRange(quoteTags);
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return CreatedAtAction("GetTags", quoteTags);
         }
 
         // DELETE: api/Quotes/5
