@@ -16,6 +16,7 @@ using WebAPI.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Http;
+using Microsoft.OpenApi.Models;
 using System.Text;
 
 namespace WebAPI
@@ -72,6 +73,10 @@ namespace WebAPI
                     return Task.CompletedTask;
                 };
             });
+            services.AddSwaggerGen(conf =>
+            {
+                conf.SwaggerDoc(name:"v1", new OpenApiInfo { Title = "Web API Demo", Version = "v1" });
+            });
             services.AddControllersWithViews();
             services.AddRazorPages();
         }
@@ -97,6 +102,13 @@ namespace WebAPI
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseSwagger();
+
+            app.UseSwaggerUI(conf =>
+            {
+                conf.SwaggerEndpoint(url:"/swagger/v1/swagger.json", name: "Web API Demo");
+            });
 
             app.UseEndpoints(endpoints =>
             {
