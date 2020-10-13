@@ -98,16 +98,16 @@ namespace WebAPI.Controllers
             //{
             //    result.Add(item.Tag);
             //}
-            var quote =  _context.Quotes.Where(q => q.Id == id)
+            var quote =  await _context.Quotes.Where(q => q.Id == id)
                     .Include(s => s.QuoteTags)
-                    .ThenInclude(tag => tag.Tag);
+                    .ThenInclude(tag => tag.Tag).AsNoTracking().SingleOrDefaultAsync();
 
             if (quote == null)
             {
                 return NotFound();
             }
 
-            return Ok(quote.Select(item => item.QuoteTags.Select(tag => tag.Tag)).ToList());
+            return quote.QuoteTags.Select(tag => tag.Tag).ToList();
         }
 
         [HttpPost("{id}/tags")]
@@ -127,6 +127,22 @@ namespace WebAPI.Controllers
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetTags", quoteTags);
+        }
+
+        // DELETE: api/Quotes/5/tags/1
+        [HttpDelete("{quoteId}/tags/{quoteTagId}")]
+        public async Task<ActionResult<QuoteTag>> DeleteQuote(int quoteId, int tagId)
+        {
+            var quoteTag = await _context.QuoteTags.Where(x => x.QuoteId == quoteId && x.TagId == tagId).SingleOrDefaultAsync();
+            if (quoteTag == null)
+            {
+                return NotFound();
+            }
+
+            _context.QuoteTags.Remove(quoteTag);
+            await _context.SaveChangesAsync();
+
+            return quoteTag;
         }
 
         // DELETE: api/Quotes/5
