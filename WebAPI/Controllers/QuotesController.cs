@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Data;
@@ -74,6 +75,45 @@ namespace WebAPI.Controllers
             return NoContent();
         }
 
+        //https://docs.microsoft.com/en-us/aspnet/core/web-api/jsonpatch?view=aspnetcore-3.1 WTF :)
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> JsonPatchWithModelState(int id, [FromBody] JsonPatchDocument<Quote> patchDoc)
+        {
+            if (patchDoc != null)
+            {
+                var quote = await _context.Quotes.FindAsync(id);
+
+                patchDoc.ApplyTo(quote, ModelState);
+
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                try
+                {
+                    _context.Quotes.Update(quote);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!QuoteExists(id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+
+                return new ObjectResult(quote);
+            }
+            else
+            {
+                return BadRequest(ModelState);
+            }
+        }
         // POST: api/Quotes
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
