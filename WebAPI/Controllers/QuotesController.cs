@@ -110,6 +110,27 @@ namespace WebAPI.Controllers
             return quote.QuoteTags.Select(tag => tag.Tag).ToList();
         }
 
+        [HttpGet("{id}/full")]
+        public async Task<ActionResult<QuoteTagsViewModel>> GetQuoteFull(int id)
+        {
+            var quote = await _context.Quotes.Where(q => q.Id == id)
+                    .Include(s => s.QuoteTags)
+                    .ThenInclude(tag => tag.Tag).AsNoTracking().SingleOrDefaultAsync();
+
+            if (quote == null)
+            {
+                return NotFound();
+            }
+
+            QuoteTagsViewModel result = new QuoteTagsViewModel
+            {
+                Id = quote.Id,
+                Text = quote.Text,
+                Tags = quote.QuoteTags.Select(tag => tag.Tag).ToList()
+            };
+            return result;
+        }
+
         [HttpPost("{id}/tags")]
         public async Task<ActionResult<Quote>> PostTags(int id, [FromBody] IEnumerable<int> tagIds)
         {

@@ -77,6 +77,17 @@ namespace WebAPI
             {
                 conf.SwaggerDoc(name:"v1", new OpenApiInfo { Title = "Web API Demo", Version = "v1" });
             });
+
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                    builder =>
+                    {
+                        builder.WithOrigins("http://localhost:3000");
+                    });
+            });
+
+
             services.AddControllersWithViews();
             services.AddRazorPages();
         }
@@ -99,6 +110,8 @@ namespace WebAPI
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseCors();
 
             app.UseAuthentication();
             app.UseAuthorization();
