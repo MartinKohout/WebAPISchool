@@ -31,9 +31,19 @@ namespace WebAPI.Data
             modelBuilder.Entity<Tag>().HasData(new Tag { Id = 2, Name = "Pepa Autor", Category = Category.Author });
             modelBuilder.Entity<Tag>().HasData(new Tag { Id = 3, Name = "České příslový", Category = Category.Genre });
 
-            modelBuilder.Entity<QuoteTag>().HasData(new QuoteTag { Id = 1, QuoteId = 1, TagId = 1 });
-            modelBuilder.Entity<QuoteTag>().HasData(new QuoteTag { Id = 2, QuoteId = 2, TagId = 2});
-            modelBuilder.Entity<QuoteTag>().HasData(new QuoteTag { Id = 3, QuoteId = 3, TagId = 3});
+            modelBuilder.Entity<QuoteTag>().HasData(new QuoteTag { QuoteId = 1, TagId = 1 });
+            modelBuilder.Entity<QuoteTag>().HasData(new QuoteTag { QuoteId = 2, TagId = 2});
+            modelBuilder.Entity<QuoteTag>().HasData(new QuoteTag { QuoteId = 3, TagId = 3});
+
+            modelBuilder.Entity<QuoteTag>()
+                .HasOne(q => q.Quote)
+                .WithMany(u => u.QuoteTags)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<QuoteTag>()
+                .HasOne(q => q.Tag)
+                .WithMany(u => u.QuoteTags)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<QuoteTag>().HasKey(tq => new { tq.QuoteId, tq.TagId });
         }
     }
 }

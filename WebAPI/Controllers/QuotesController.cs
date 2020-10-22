@@ -191,7 +191,7 @@ namespace WebAPI.Controllers
         }
 
         // DELETE: api/Quotes/5/tags/1
-        [HttpDelete("{quoteId}/tags/{quoteTagId}")]
+        [HttpDelete("{quoteId}/tags/{tagId}")]
         public async Task<ActionResult<QuoteTag>> DeleteQuote(int quoteId, int tagId)
         {
             var quoteTag = await _context.QuoteTags.Where(x => x.QuoteId == quoteId && x.TagId == tagId).SingleOrDefaultAsync();

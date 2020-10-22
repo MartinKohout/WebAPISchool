@@ -9,17 +9,10 @@ namespace WebAPI.Models
 {
     public class QuoteTag
     {
-        [Key]
-        public int Id { get; set; }
-
         public int QuoteId { get; set; }
-
-        [ForeignKey("QuoteId")]
         public Quote Quote { get; set; }
 
         public int TagId { get; set; }
-
-        [ForeignKey("TagId")]
         public Tag Tag { get; set; }
     }
 }
